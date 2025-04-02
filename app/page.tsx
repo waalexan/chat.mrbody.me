@@ -23,11 +23,11 @@ function ChatBot() {
     setMessages(prev => [
       ...prev,
       { text: userMessage, isBot: false },
-      { text: '▌', isBot: true },
+      { text: ' ●', isBot: true },
     ]);
 
     try {
-      const response = await fetch('/api/chat', {
+      const response = await fetch('/api/ia/chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -56,7 +56,7 @@ function ChatBot() {
           if (lastMessage.isBot) {
             newMessages[newMessages.length - 1] = {
               ...lastMessage,
-              text: botResponse + '▌',
+              text: botResponse + ' ●',
             };
           }
           return newMessages;

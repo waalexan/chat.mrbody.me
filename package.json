@@ -10,11 +10,21 @@
   },
   "dependencies": {
     "@google/generative-ai": "^0.21.0",
+    "@react-pdf/renderer": "^4.3.0",
+    "express-session": "^1.18.1",
+    "firebase": "^11.6.0",
     "lucide-react": "^0.486.0",
     "next": "15.2.4",
+    "next-auth": "^4.24.11",
+    "next-connect": "^1.0.0",
+    "passport": "^0.7.0",
+    "passport-google-oauth20": "^2.0.0",
+    "passport-session": "^1.0.2",
+    "pdfjs-dist": "^2.16.105",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-markdown": "^10.1.0"
+    "react-markdown": "^10.1.0",
+    "react-pdf": "^9.2.1"
   },
   "devDependencies": {
     "@tailwindcss/postcss": "^4",

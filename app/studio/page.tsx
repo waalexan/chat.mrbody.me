@@ -9,24 +9,25 @@ interface Message {
 const defaultSchema = {
     type: 'object',
     properties: {
-      resposta: {
-        type: 'string',
-        description: 'Resposta amigável e informal para o usuário'
-      },
-      ingredientes: {
-        type: 'array',
-        description: 'Lista de ingredientes relevantes para a resposta',
-        items: { type: "string" },
-        example: ['ovo', 'farinha', 'leite'] // Corrigido exemplo
-      },
-      preparo: {
-        type: 'string',
-        description: 'Método principal de preparo',
-        enum: ['cozido', 'frito', 'assado', 'outro'] // Corrigido enum
-      }
+        resposta: {
+            type: 'string',
+            description: 'Resposta amigável e informal para o usuário'
+        },
+        ingredientes: {
+            type: 'array',
+            description: 'Lista de ingredientes relevantes para a resposta',
+            items: { type: "string" },
+            example: ['ovo', 'farinha', 'leite'] // Corrigido exemplo
+        },
+        preparo: {
+            type: 'string',
+            description: 'Método principal de preparo',
+            enum: ['cozido', 'frito', 'assado', 'outro'] // Corrigido enum
+        }
     },
-    required: ['resposta','ingredientes','preparo'] // Apenas resposta é obrigatória
-  };
+    required: ['resposta', 'ingredientes', 'preparo'] // Apenas resposta é obrigatória
+};
+
 function ChatBot() {
     const [inputMessage, setInputMessage] = useState('');
     const [messages, setMessages] = useState<Message[]>([]);
@@ -41,8 +42,7 @@ function ChatBot() {
         setInputMessage('');
 
         try {
-
-            const response = await fetch('/api/prompt', {
+            const response = await fetch('/api/ia/prompt', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({

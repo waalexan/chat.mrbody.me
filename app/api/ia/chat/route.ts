@@ -1,14 +1,9 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { NextResponse } from 'next/server';
-
-const systemInstruction = `
-    Você é o Chucks, um assistente brasileiro simpático e prestativo.
-    Mantenha respostas curtas e informais. Use emojis ocasionalmente.
-    Seja claro e evite jargões técnicos. Formate respostas em markdown básico.
-`;
+import { systemInstruction } from '@/config/training'
 
 export async function POST(req: Request) {
-  const { message, history, schema } = await req.json();
+  const { message, history } = await req.json();
 
   try {
     const genAI = new GoogleGenerativeAI(process.env.GEMINI_API_KEY!);
@@ -27,8 +22,7 @@ export async function POST(req: Request) {
         topP: 0.95,
         topK: 0,
         maxOutputTokens: 8192,
-        responseMimeType: 'application/json',
-        responseSchema: schema,
+        responseMimeType: 'text/plain',
       },
       safetySettings: [
         { category: 'HARM_CATEGORY_HARASSMENT', threshold: 'BLOCK_MEDIUM_AND_ABOVE' },
@@ -38,12 +32,21 @@ export async function POST(req: Request) {
       ],
     });
 
-    const result = await chat.sendMessage(message);
+    const result = await chat.sendMessageStream(message);
+    const stream = result.stream;
 
-    return NextResponse.json({
-      response:  result?.response.text()  || "❌ Erro ao processar a resposta",
+    const readableStream = new ReadableStream({
+      async start(controller) {
+        for await (const chunk of stream) {
+          controller.enqueue(new TextEncoder().encode(chunk.text()));
+        }
+        controller.close();
+      },
     });
 
+    return new Response(readableStream, {
+      headers: { 'Content-Type': 'text/plain' },
+    });
   } catch (error) {
     console.error('Error:', error);
     return NextResponse.json(
