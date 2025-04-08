@@ -1,8 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  --primary-color: #0d48b6; /* Azul primário */
+  --segundary-color: #09a116; /* Verde secundário */
+  --tertiary-color: #a16c09; /* Cor terciária (laranja) */
+  --background: #ffffff; /* Cor de fundo clara */
+  --backgroundTwo: #dbdde0; /* Segundo tom de fundo */
+  --backgroundThree: #dfdada; /* Terceiro tom de fundo */
+  --border-line: #dddddd; /* Cor da linha de borda */
+  --foreground: #171717; /* Cor do texto escuro */
 }
 
 @theme inline {
@@ -14,8 +20,14 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+    --background: #1e1e1e; /* Cor de fundo escura */
+    --backgroundTwo: #ffffff; /* Tom mais escuro de fundo */
+    --backgroundThree: #252525; /* Cor terciária escura */
+    --border-line: #444444; /* Cor da linha de borda em tema escuro */
+    --foreground: #e0e0e0; /* Texto claro no tema escuro */
+    --primary-color: #bb86fc; /* Azul claro para o tema escuro */
+    --segundary-color: #03dac5; /* Verde mais suave para o tema escuro */
+    --tertiary-color: #ff9800; /* Laranja mais suave no tema escuro */
   }
 }
 
