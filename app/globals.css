@@ -3,10 +3,13 @@
 :root {
   --primary-color: #0d48b6; /* Azul primário */
   --segundary-color: #09a116; /* Verde secundário */
+  --text-header: #053e6d; /* Terceiro tom de fundo */
   --tertiary-color: #a16c09; /* Cor terciária (laranja) */
   --background: #ffffff; /* Cor de fundo clara */
   --backgroundTwo: #dbdde0; /* Segundo tom de fundo */
   --backgroundThree: #dfdada; /* Terceiro tom de fundo */
+  --backgroundFour: #0261af; /* Terceiro tom de fundo */
+  --button-color: #dddd;
   --border-line: #dddddd; /* Cor da linha de borda */
   --foreground: #171717; /* Cor do texto escuro */
 }
@@ -20,13 +23,16 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
-    --background: #1e1e1e; /* Cor de fundo escura */
-    --backgroundTwo: #ffffff; /* Tom mais escuro de fundo */
+    --background: #141414; /* Cor de fundo escura */
+    --backgroundTwo: #080808; /* Tom mais escuro de fundo */
     --backgroundThree: #252525; /* Cor terciária escura */
-    --border-line: #444444; /* Cor da linha de borda em tema escuro */
+    --backgroundFour: #022038; /* Terceiro tom de fundo */
+    --button-color: #161616dd;
+    --border-line: #64636338; /* Cor da linha de borda em tema escuro */
     --foreground: #e0e0e0; /* Texto claro no tema escuro */
-    --primary-color: #bb86fc; /* Azul claro para o tema escuro */
-    --segundary-color: #03dac5; /* Verde mais suave para o tema escuro */
+    --primary-color: #0d48b6; /* Azul claro para o tema escuro */
+    --text-header: #022847; /* Terceiro tom de fundo */
+    --segundary-color: #09a116; /* Verde mais suave para o tema escuro */
     --tertiary-color: #ff9800; /* Laranja mais suave no tema escuro */
   }
 }

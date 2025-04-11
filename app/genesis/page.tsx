@@ -1,4 +1,6 @@
 'use client';
+import { SideBar } from '@/components/Sidebar';
+import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import React, { useState } from 'react';
 
 interface Message {
@@ -64,13 +66,13 @@ function ChatBot() {
       }
 
       // Remove indicador de digitação
-      setMessages(prev => prev.map((msg, index) => 
+      setMessages(prev => prev.map((msg, index) =>
         index === prev.length - 1 ? { ...msg, text: botResponse } : msg
       ));
 
     } catch (error) {
       console.error('Erro:', error);
-      setMessages(prev => prev.map((msg, index) => 
+      setMessages(prev => prev.map((msg, index) =>
         index === prev.length - 1 ? { ...msg, text: '❌ Erro ao processar' } : msg
       ));
     } finally {
@@ -79,51 +81,72 @@ function ChatBot() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto bg-white rounded-lg shadow-lg p-4">
-      <div className="h-96 overflow-y-auto mb-4">
-        {messages.map((message, index) => (
-          <div
-            key={index}
-            className={`mb-3 p-3 rounded-lg ${
-              message.isBot
-                ? 'bg-blue-50 ml-auto border border-blue-100'
-                : 'bg-gray-50 mr-auto border border-gray-100'
-            }`}
-            style={{ maxWidth: '90%' }}
-          >
-            <div className={`text-sm ${message.isBot ? 'text-blue-600' : 'text-gray-600'}`}>
-              {message.isBot ? (
-                <div className="prose" dangerouslySetInnerHTML={{ 
-                  __html: message.text.replace(/\n/g, '<br/>') 
-                }} />
-              ) : (
-                message.text
-              )}
-            </div>
-          </div>
-        ))}
-      </div>
+    <div className="flex flex-row h-screen">
+      <nav className="flex-shrink-0 bg-[var(--backgroundTwo)]">
+        <SideBar className="h-full" page="/genesis" />
+      </nav>
 
-      <form onSubmit={handleSubmit} className="flex gap-2">
-        <input
-          type="text"
-          value={inputMessage}
-          onChange={(e) => setInputMessage(e.target.value)}
-          placeholder="Converse com o Chucks..."
-          className="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
-          disabled={isLoading}
-        />
-        <button
-          type="submit"
-          className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 
+      <main className="flex-1 h-full">
+        <ResizablePanelGroup direction="horizontal" className="h-full">
+
+          <ResizablePanel defaultSize={20} maxSize={20} className="bg-[var(--backgroundTwo)] contain-content border-r-[1px] border-r-[var(--border-line)]">
+
+          </ResizablePanel>
+
+          <ResizableHandle />
+
+          <ResizablePanel defaultSize={80} className="">
+            <div className="w-full h-full">
+              <div className="h-96 overflow-y-auto mb-4">
+                {messages.map((message, index) => (
+                  <div
+                    key={index}
+                    className={`mb-3 p-3 rounded-lg ${message.isBot
+                        ? 'bg-blue-50 ml-auto border border-blue-100'
+                        : 'bg-gray-50 mr-auto border border-gray-100'
+                      }`}
+                    style={{ maxWidth: '90%' }}
+                  >
+                    <div className={`text-sm ${message.isBot ? 'text-blue-600' : 'text-gray-600'}`}>
+                      {message.isBot ? (
+                        <div className="prose" dangerouslySetInnerHTML={{
+                          __html: message.text.replace(/\n/g, '<br/>')
+                        }} />
+                      ) : (
+                        message.text
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              <form onSubmit={handleSubmit} className="flex gap-2">
+                <input
+                  type="text"
+                  value={inputMessage}
+                  onChange={(e) => setInputMessage(e.target.value)}
+                  placeholder="Converse com o Chucks..."
+                  className="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
+                  disabled={isLoading}
+                />
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 
                      disabled:bg-gray-400 transition-colors duration-200"
-          disabled={isLoading || !inputMessage.trim()}
-        >
-          {isLoading ? 'Enviando...' : 'Enviar'}
-        </button>
-      </form>
+                  disabled={isLoading || !inputMessage.trim()}
+                >
+                  {isLoading ? 'Enviando...' : 'Enviar'}
+                </button>
+              </form>
+            </div>
+          </ResizablePanel>
+
+        </ResizablePanelGroup>
+      </main>
     </div>
-  );
+  )
+
+
 }
 
 export default ChatBot;
