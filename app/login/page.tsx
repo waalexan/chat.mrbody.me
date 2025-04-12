@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { GoogleLogin } from '@/service/google.auth';
-import { Command, Eye, EyeOff, Key, Mail } from 'lucide-react';
+import { Command, Eye, EyeOff, Key, Mail, User } from 'lucide-react';
 import Link from 'next/link';
 
 const LoginPage = () => {
@@ -60,14 +60,14 @@ const LoginPage = () => {
                         {/* Campo de Email */}
                         <div className='relative'>
                             <div className='absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none'>
-                                <Mail size={18} className='text-[#333]' />
+                                <User size={18} className='text-[#333]' />
                             </div>
                             <input
                                 className='w-full pl-10 border border-[var(--border-line)] py-3 px-3 rounded-md outline-none focus:ring-2 focus:ring-[var(--primary-color)] bg-transparent'
                                 type='email'
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
-                                placeholder='seuemail@example.com'
+                                placeholder='seuemail@example.com or numero'
                                 required
                             />
                         </div>
@@ -94,6 +94,14 @@ const LoginPage = () => {
                             </button>
                         </div>
 
+                        <div>
+                            <Link href={"/reset"}
+                            className='text-sm text-[var(--primary-color)] justify-end hover:underline'
+                            >
+                                Esquece a minha palavra-passe
+                            </Link>
+                        </div>
+
                         <button
                             type='submit'
                             disabled={isLoading}
@@ -106,7 +114,7 @@ const LoginPage = () => {
 
                     <div className='mt-8 text-sm text-center text-[var(--foreground-secondary)]'>
                         <span>
-                            Don't have an account? <Link href={"/register"} className='text-[var(--primary-color)] hover:underline'>Sign up</Link>
+                            Eu não tenho uma conta? <Link href={"/register"} className='text-[var(--primary-color)] hover:underline'>Sign up</Link>
                         </span>
                     </div>
 
