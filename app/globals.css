@@ -6,7 +6,7 @@
   --text-header: #053e6d; /* Terceiro tom de fundo */
   --tertiary-color: #a16c09; /* Cor terciária (laranja) */
   --background: #ffffff; /* Cor de fundo clara */
-  --backgroundTwo: #dbdde0; /* Segundo tom de fundo */
+  --backgroundTwo: #ffffff; /* Segundo tom de fundo */
   --backgroundThree: #dfdada; /* Terceiro tom de fundo */
   --backgroundFour: #0261af; /* Terceiro tom de fundo */
   --button-color: #dddd;
@@ -41,4 +41,21 @@ body {
   background: var(--background);
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
+}
+
+/* Pode colocar no seu global.css */
+#nprogress {
+  pointer-events: none;
+}
+
+#nprogress .bar {
+  background: var(--primary-color);
+
+  position: fixed;
+  z-index: 1031;
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 2px;
 }

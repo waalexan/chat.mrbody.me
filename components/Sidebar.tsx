@@ -36,17 +36,6 @@ export function SideBar({ className, page }: { className?: string, page?: string
                     passHref
                     className="flex flex-col items-center justify-center p-2"
                 >
-                    <div className="p-3 border-[1px] border-[var(--tertiary-color)] rounded-md">
-                        <Gem size={18} className="text-[var(--tertiary-color)]" />
-                    </div>
-                    <span className="text-[8pt] font-bold text-[var(--tertiary-color)]">Primium</span>
-                </Link>
-
-                <Link
-                    href={""}  // Navegação usando Link
-                    passHref
-                    className="flex flex-col items-center justify-center p-2"
-                >
                     <div className="p-3 bg-[var(--primary-color)] rounded-md">
                         <Plus size={18} className="text-[var(--backgroundTwo)]" />
                     </div>

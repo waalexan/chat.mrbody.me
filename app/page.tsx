@@ -3,7 +3,7 @@ import Dashboard from "./u/page";
 
 const useToken = () => {  // Removed async since there's no await
     try {
-        const response = false;
+        const response = true;
 
         if (response)
             return { status: 200, token: "7w7950nnxkchhiy78ry2" };

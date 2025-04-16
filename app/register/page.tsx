@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { GoogleLogin } from '@/service/google.auth';
-import { Command, Eye, EyeOff, Key,  Phone, User } from 'lucide-react';
+import { Command, Eye, EyeOff, Key,  Mail,  Phone, User } from 'lucide-react';
 import world from "@/config/world.json"
 import Link from 'next/link';
 import Image from 'next/image';
@@ -16,6 +16,7 @@ const LoginPage = () => {
     const [phone, setPhone] = React.useState('');
     const [firstName, setFirstName] = React.useState('');
     const [lastName, setLastName] = React.useState('');
+    const [email, setEmail] = React.useState('');
     const [password, setPassword] = React.useState('');
     const [confirmPassword, setConfirmPassword] = React.useState('');
     const [acceptedTerms, setAcceptedTerms] = React.useState(false);
@@ -103,15 +104,17 @@ const LoginPage = () => {
 
                     {!phoneVerified ? (
                         <form onSubmit={handlePhoneSubmit} className='space-y-4'>
-                            <div className=''>
-                            <Image 
-                                src={countryIcon} 
-                                alt="Country Icon"
-                                width={50}
-                                height={50}
-                            />
-
-                                <select value={selectedCountry} onChange={handleChange}>
+                            <div className='flex items-center gap-3 h-[50px] justify-center w-full  border border-[var(--border-line)] py-3 px-3 rounded-md outline-none focus:ring-2 focus:ring-[var(--primary-color)] bg-transparent'>
+                                <Image 
+                                    src={countryIcon} 
+                                    className='pl-3'
+                                    alt="Country Icon"
+                                    width={50}
+                                    height={50}
+                                />
+                                <select
+                                    className='bg-[var(--backgroundTwo)] outline-none w-[90%]'
+                                    value={selectedCountry} onChange={handleChange}>
                                     {world.map((item, index) => (
                                     <option key={index} value={item.name}>
                                         {item.name}
@@ -120,15 +123,15 @@ const LoginPage = () => {
                                 </select>
                             </div>
                             <div className='relative'>
-                                <div className='absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none'>
+                                <div className='absolute inset-y-0 left-2 flex items-center pl-3 pointer-events-none'>
                                     <span>+{callingCodes}</span>
                                 </div>
                                 <input
-                                    className='w-full pl-10 border border-[var(--border-line)] py-3 px-3 rounded-md outline-none focus:ring-2 focus:ring-[var(--primary-color)] bg-transparent'
+                                    className='w-full pl-20 border border-[var(--border-line)] py-3 px-3 rounded-md outline-none focus:ring-2 focus:ring-[var(--primary-color)] bg-transparent'
                                     type='tel'
                                     value={phone}
                                     onChange={(e) => setPhone(e.target.value)}
-                                    placeholder='000-000-000'
+                                    placeholder='000 000 000'
                                     required
                                 />
                             </div>
@@ -175,13 +178,15 @@ const LoginPage = () => {
                             {/* Email (apenas exibição) */}
                             <div className='relative'>
                                 <div className='absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none'>
-                                    <Phone size={18} className='text-[#333]' />
+                                    <Mail size={18} className='text-[#333]' />
                                 </div>
                                 <input
-                                    className='w-full pl-10 border border-[var(--border-line)] py-3 px-3 rounded-md outline-none bg-gray-100 cursor-not-allowed'
-                                    type='tel'
-                                    value={phone}
-                                    readOnly
+                                    className='w-full pl-10 border border-[var(--border-line)] py-3 px-3 rounded-md outline-none  cursor-not-allowed'
+                                    type='email'
+                                    value={email}
+                                    required
+                                    placeholder='seuemail@gmail.com'
+                                    onChange={(e) => setEmail(e.target.value)}
                                 />
                             </div>
 

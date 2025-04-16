@@ -1,23 +1,12 @@
 'use client';
 
 import { SideBar } from "@/components/Sidebar";
-import { PDFViewer, pdf } from '@react-pdf/renderer';
-import { PDFDocument } from '@/service/GenPdf';
 import HomeSide from "@/components/sidebar/home";
 import {
   ResizableHandle,
   ResizablePanel,
   ResizablePanelGroup
 } from "@/components/ui/resizable";
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  DialogTrigger
-} from "@/components/ui/dialog";
 import {
   Table,
   TableBody,
@@ -26,44 +15,13 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu";
 import { Ellipsis, Eye, Search } from "lucide-react";
 import { employeeProp } from "@/app/types/interfaces";
 import { useEffect, useState } from "react";
 import { database } from "@/config/firebase";
-import { toast } from "sonner"
 import { ref, onValue } from "firebase/database";
 
-// Função para imprimir PDF
-export const handlePrint = ({ data }: { data: employeeProp }) => {
-  const doc = pdf(<PDFDocument data={data} />);
-  doc.toBlob().then((blob) => {
-    const url = URL.createObjectURL(blob);
-    const iframe = document.createElement('iframe');
-    iframe.style.position = 'absolute';
-    iframe.style.visibility = 'hidden';
-    iframe.src = url;
-    document.body.appendChild(iframe);
-    iframe.contentWindow?.print();
-  });
-};
 
-// Função para baixar PDF
-export const handleDownload = ({ data }: { data: employeeProp }) => {
-  const doc = pdf(<PDFDocument data={data} />);
-  doc.toBlob().then((blob) => {
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `${data.name} Inicio de funções.pdf`;
-    link.click();
-  });
-};
 
 export default function App() {
   const [searchTerm, setSearchTerm] = useState<string>("");
@@ -77,15 +35,6 @@ export default function App() {
       const employeesList = data ? Object.values(data) : [];
       setEmployees(employeesList);
       setFilteredData(employeesList); // <- Aqui corrige o erro
-
-      toast("Event has been created", {
-        description: "Sunday, December 03, 2023 at 9:00 AM",
-        action: {
-          label: "Undo",
-          onClick: () => console.log("Undo"),
-        },
-      })
-
     });
   }, []);
 
@@ -118,7 +67,7 @@ export default function App() {
             maxSize={20}
             className="bg-[var(--backgroundTwo)] border-r border-[var(--border-line)]"
           >
-            <HomeSide subpage="/u/employee" />
+            <HomeSide subpage="/u/files" />
           </ResizablePanel>
 
           <ResizableHandle />
@@ -164,47 +113,11 @@ export default function App() {
                     <TableCell>{item.AgenteNumber}</TableCell>
 
                     <TableCell>
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <button className="text-sm text-blue-600 flex items-center gap-2">
-                            <Eye size={18} />
-                            <span>Visualizar</span>
-                          </button>
-                        </DialogTrigger>
-                        <DialogContent className="w-[90vw] h-[90vh] flex flex-col">
-                          <DialogHeader>
-                            <DialogTitle>Visualização do PDF</DialogTitle>
-                            <DialogDescription>
-                              Pré-visualização do relatório do funcionário.
-                            </DialogDescription>
-                          </DialogHeader>
-                          <div className="flex-grow w-full">
-                            <PDFViewer width="100%" height="100%" className="rounded-md">
-                              <PDFDocument data={item} />
-                            </PDFViewer>
-                          </div>
-                          <DialogFooter />
-                        </DialogContent>
-                      </Dialog>
+
                     </TableCell>
 
                     <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger>
-                          <Ellipsis size={18} />
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                          <DropdownMenuItem onClick={() => handlePrint({ data: item })}>
-                            Imprimir
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleDownload({ data: item })}>
-                            Baixar
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            Detalhes
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
+
                     </TableCell>
                   </TableRow>
                 ))}

@@ -22,11 +22,26 @@ const LoginPage = () => {
         }
     };
 
-    const handleSubmit = (e: React.FormEvent) => {
+    const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        // Adicione sua lógica de login com email/senha aqui
-        console.log({ email, password });
+    
+        // Simulação da lógica de autenticação
+        try {
+            // Substitua com sua lógica real de login
+            const mockToken = 'walter'; // aqui você usaria o token real da resposta do login
+            const urlParams = new URLSearchParams(window.location.search);
+            const redirect = urlParams.get('redirect') || 'myapp://chatbot';
+    
+            console.log({ email, password });
+    
+            // Redireciona com o token na URL
+            window.location.href = `${redirect}?token=${mockToken}`;
+        } catch (error) {
+            console.error('Erro ao fazer login:', error);
+            // Aqui você pode exibir uma mensagem de erro ao usuário
+        }
     };
+    
 
     return (
         <div className='h-screen w-full flex flex-col lg:flex-row bg-[var(--backgroundTwo)]'>
