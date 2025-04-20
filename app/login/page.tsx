@@ -70,12 +70,11 @@ const LoginPage = () => {
                 Cookies.set('token', result.id, { expires: 7 });
 
                 const redirectUrl = `${redirect}?id=${result.id}&name=${encodeURIComponent(result.name)}&email=${encodeURIComponent(result.email)}&phone=${encodeURIComponent(result.phone)}`;
-                const extra = process.env.NEXT_PUBLIC_API_APP_REDIRECT || "mapazzz://login";
 
-                if (redirect?.startsWith('http') || redirect?.startsWith(extra)) {
-                    window.location.href = redirectUrl;
+                if (redirect) {
+                    router.replace(redirectUrl);
                 } else {
-                    router.replace(redirect || '/');
+                    router.replace('/');
                 }
             } else {
                 setError(result.message || 'Erro ao fazer login');
