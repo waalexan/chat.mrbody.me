@@ -1,9 +1,25 @@
+'use client'
 import { Popover, PopoverContent, PopoverTrigger } from "@radix-ui/react-popover"
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "../ui/resizable"
 import { HomeRoute } from "@/config/dataSchema"
 import Link from "next/link"
+import Cookies from 'js-cookie';
+import { useRouter } from 'next/navigation';
 
 export default function HomeSide({ subpage }: { subpage: string }) {
+    const router = useRouter();
+
+
+    const Logout = () =>{
+        Cookies.remove('token');
+        Cookies.remove('user_id');
+        Cookies.remove('user_name');
+        Cookies.remove('user_email');
+        Cookies.remove('user_phone');
+
+        router.replace('/login');
+    }
+
     return (
         <ResizablePanelGroup direction="vertical">
 
@@ -65,7 +81,8 @@ export default function HomeSide({ subpage }: { subpage: string }) {
                         <span className="text-sm">walteralexandresantana@gmail.com</span>
                     </div>
                     <button
-                        className="w-full flex flex-col items-center justify-center p-2 text-[var(--backgroundTwo)] rounded-md border-2 border-[var(--primary-color)]"
+                        onClick={Logout}
+                        className="w-full flex flex-col cursor-pointer items-center justify-center p-2 text-[var(--backgroundTwo)] rounded-md border-2 border-[var(--primary-color)]"
                     >
 
                         <span className="text-[12pt] font-bold text-[var(--primary-color)] mt-1">Sair da conta</span>

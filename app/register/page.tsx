@@ -1,11 +1,13 @@
 'use client';
 
-import React from 'react';
+import React, { use } from 'react';
 import { GoogleLogin } from '@/service/google.auth';
-import { Command, Eye, EyeOff, Key,  Mail,  Phone, User } from 'lucide-react';
+import { Command, Eye, EyeOff, Key, Mail, Phone, User } from 'lucide-react';
 import world from "@/config/world.json"
 import Link from 'next/link';
 import Image from 'next/image';
+import { endpoint } from '@/config/microservice';
+import { useRouter } from 'next/navigation';
 
 const LoginPage = () => {
     const [showPassword, setShowPassword] = React.useState(false);
@@ -23,6 +25,8 @@ const LoginPage = () => {
     const [phoneVerified, setPhoneVerified] = React.useState(false);
     const [isLoading, setIsLoading] = React.useState(false);
 
+    const router = useRouter();
+
     const handleGoogleLogin = async () => {
         try {
             setIsLoading(true);
@@ -35,42 +39,83 @@ const LoginPage = () => {
     };
 
     const handlePhoneSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
-    // Verificação simples de número
-    const onlyNumbers = /^\d+$/;
-
-    if (onlyNumbers.test(phone)) {
-        setPhoneVerified(true);
-    } else {
-        setPhoneVerified(false);
-    }
-};
-
-
-    const handleFinalSubmit = (e: React.FormEvent) => {
         e.preventDefault();
+        // Verificação simples de número
+        const onlyNumbers = /^\d+$/;
+
+        if (onlyNumbers.test(phone)) {
+            setPhoneVerified(true);
+        } else {
+            setPhoneVerified(false);
+        }
+    };
+
+
+    const handleFinalSubmit = async (e: React.FormEvent) => {
+        e.preventDefault();
+
         if (password !== confirmPassword) {
             alert('As senhas não coincidem!');
             return;
         }
+
         if (!acceptedTerms) {
             alert('Você deve aceitar os termos e política de privacidade!');
             return;
+        }
+
+        setIsLoading(true);
+        try {
+            const response = await fetch(`${endpoint.api_login}/auth/register`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Accept': 'application/json'
+                },
+                body: JSON.stringify({
+                    ddd: callingCodes,
+                    phone: phone,
+                    name: `${firstName} ${lastName}`,
+                    email: email,
+                    password: password
+                })
+            });
+
+            if(!response.ok)
+            {
+                alert('Erro ao cadastrar: ' + response.statusText);
+                return;
+            }
+
+            const data = await response.json();
+           
+            router.push(`/account/otp/${data.id}?phone=+${callingCodes}${phone}&email=${email}&verified=false`);
+
+        } catch (error: any) {
+            console.error('Erro ao cadastrar:', error);
+            alert('Erro ao cadastrar: ' + error.message);
+        } finally {
+            setIsLoading(false);
         }
     };
 
     const handleChange = (e: any) => {
         const selectedName = e.target.value;
         setSelectedCountry(selectedName);
-    
+
         const country = world.find(item => item.name === selectedName);
         if (country) {
             setCallingCodes(country.callingCodes[0])
             setCountryIcon(country.flags.png); // Atualiza o ícone
         }
-      };
+    };
 
 
+    if (isLoading) {
+        return (
+            <h1>logando</h1>
+        )
+    }
 
     return (
         <div className='h-screen w-full flex flex-col lg:flex-row bg-[var(--backgroundTwo)]'>
@@ -105,8 +150,8 @@ const LoginPage = () => {
                     {!phoneVerified ? (
                         <form onSubmit={handlePhoneSubmit} className='space-y-4'>
                             <div className='flex items-center gap-3 h-[50px] justify-center w-full  border border-[var(--border-line)] py-3 px-3 rounded-md outline-none focus:ring-2 focus:ring-[var(--primary-color)] bg-transparent'>
-                                <Image 
-                                    src={countryIcon} 
+                                <Image
+                                    src={countryIcon}
                                     className='pl-3'
                                     alt="Country Icon"
                                     width={50}
@@ -116,9 +161,9 @@ const LoginPage = () => {
                                     className='bg-[var(--backgroundTwo)] outline-none w-[90%]'
                                     value={selectedCountry} onChange={handleChange}>
                                     {world.map((item, index) => (
-                                    <option key={index} value={item.name}>
-                                        {item.name}
-                                    </option>
+                                        <option key={index} value={item.name}>
+                                            {item.name}
+                                        </option>
                                     ))}
                                 </select>
                             </div>
@@ -257,6 +302,7 @@ const LoginPage = () => {
                             <button
                                 type='submit'
                                 disabled={isLoading}
+                                onClick={handleFinalSubmit}
                                 className='w-full p-3 rounded-md cursor-pointer bg-[var(--primary-color)] text-white font-medium hover:bg-[var(--backgroundFour)] transition disabled:opacity-50 disabled:cursor-not-allowed'
                             >
                                 {isLoading ? 'Criando conta...' : 'Criar conta'}

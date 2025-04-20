@@ -39,32 +39,6 @@ import { database } from "@/config/firebase";
 import { toast } from "sonner"
 import { ref, onValue } from "firebase/database";
 
-// Função para imprimir PDF
-export const handlePrint = ({ data }: { data: employeeProp }) => {
-  const doc = pdf(<PDFDocument data={data} />);
-  doc.toBlob().then((blob) => {
-    const url = URL.createObjectURL(blob);
-    const iframe = document.createElement('iframe');
-    iframe.style.position = 'absolute';
-    iframe.style.visibility = 'hidden';
-    iframe.src = url;
-    document.body.appendChild(iframe);
-    iframe.contentWindow?.print();
-  });
-};
-
-// Função para baixar PDF
-export const handleDownload = ({ data }: { data: employeeProp }) => {
-  const doc = pdf(<PDFDocument data={data} />);
-  doc.toBlob().then((blob) => {
-    const url = URL.createObjectURL(blob);
-    const link = document.createElement('a');
-    link.href = url;
-    link.download = `${data.name} Inicio de funções.pdf`;
-    link.click();
-  });
-};
-
 export default function App() {
   const [searchTerm, setSearchTerm] = useState<string>("");
   const [employees, setEmployees] = useState<employeeProp[]>([]);
@@ -74,7 +48,7 @@ export default function App() {
     const employeesRef = ref(database, 'employees/');
     onValue(employeesRef, (snapshot) => {
       const data = snapshot.val();
-      const employeesList = data ? Object.values(data) : [];
+      const employeesList = data ? Object.values(data) as employeeProp[] : [];
       setEmployees(employeesList);
       setFilteredData(employeesList); // <- Aqui corrige o erro
 
@@ -88,6 +62,32 @@ export default function App() {
 
     });
   }, []);
+
+  // Função para imprimir PDF
+  const handlePrint = ({ data }: { data: employeeProp }) => {
+    const doc = pdf(<PDFDocument data={data} />);
+    doc.toBlob().then((blob) => {
+      const url = URL.createObjectURL(blob);
+      const iframe = document.createElement('iframe');
+      iframe.style.position = 'absolute';
+      iframe.style.visibility = 'hidden';
+      iframe.src = url;
+      document.body.appendChild(iframe);
+      iframe.contentWindow?.print();
+    });
+  };
+
+  // Função para baixar PDF
+  const handleDownload = ({ data }: { data: employeeProp }) => {
+    const doc = pdf(<PDFDocument data={data} />);
+    doc.toBlob().then((blob) => {
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `${data.name} Inicio de funções.pdf`;
+      link.click();
+    });
+  };
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const searchQuery = e.target.value.toLowerCase();

@@ -1,9 +1,7 @@
 'use client';
+import { SideBar } from '@/components/Sidebar';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from '@/components/ui/resizable';
 import React, { useState } from 'react';
-import { MarkdownRenderer } from './MarkdownRenderer';
-import { MessageCircleQuestion, RefreshCcw, ThumbsDown, ThumbsUp, User, ArrowUpRight, CirclePause } from 'lucide-react';
-import { SideBar } from '@/components/Sidebar';
 
 interface Message {
   text: string;
@@ -85,8 +83,9 @@ function ChatBot() {
   return (
     <div className="flex flex-row h-screen">
       <nav className="flex-shrink-0 bg-[var(--backgroundTwo)]">
-          <SideBar className="h-full" page="/genesis" />
+        <SideBar className="h-full" page="/genesis" />
       </nav>
+
       <main className="flex-1 h-full">
         <ResizablePanelGroup direction="horizontal" className="h-full">
 
@@ -96,76 +95,48 @@ function ChatBot() {
 
           <ResizableHandle />
 
-          <ResizablePanel defaultSize={100} className="flex justify-center pb-7">
-            <div className="w-full h-full flex flex-col  flex-1">
-              <div className="flex flex-col flex-1 w-full  overflow-y-auto ">
+          <ResizablePanel defaultSize={80} className="">
+            <div className="w-full h-full">
+              <div className="h-96 overflow-y-auto mb-4">
                 {messages.map((message, index) => (
                   <div
                     key={index}
-                    className={`p-3 w-full px-[120px] ${message.isBot
-                        ? 'bg-[var(--background)]'
-                        : 'bg-[var(--backgroundThree)] py-10 mr-auto'
+                    className={`mb-3 p-3 rounded-lg ${message.isBot
+                        ? 'bg-blue-50 ml-auto border border-blue-100'
+                        : 'bg-gray-50 mr-auto border border-gray-100'
                       }`}
+                    style={{ maxWidth: '90%' }}
                   >
-                    <div className={`text-sm ${message.isBot ? 'text-[var(--foreground)]' : 'text-[var(--forecolor)]'}`}>
+                    <div className={`text-sm ${message.isBot ? 'text-blue-600' : 'text-gray-600'}`}>
                       {message.isBot ? (
-                        <MarkdownRenderer response={message.text} />
+                        <div className="prose" dangerouslySetInnerHTML={{
+                          __html: message.text.replace(/\n/g, '<br/>')
+                        }} />
                       ) : (
-                        <>
-                          <div className='flex items-center gap-4 relative'>
-                            <div className='bg-[var(--background)] w-[40px] h-[40px] flex items-center justify-center rounded-full'>
-                              <User size={24} />
-                            </div>
-                            <span>{message.text}</span>
-
-                            <div className='flex items-center gap-4 absolute -bottom-6 ml-14'>
-                              <button className='hover:text-[var(--primary-color)] cursor-pointer '>
-                                <ThumbsDown size={14} />
-                              </button>
-                              <button className='hover:text-[var(--primary-color)] cursor-pointer '>
-                                <ThumbsUp size={14} />
-                              </button>
-                              <button className='hover:text-[var(--primary-color)] cursor-pointer '>
-                                <RefreshCcw size={14} />
-                              </button>
-                              <button className='hover:text-[var(--primary-color)] cursor-pointer '>
-                                <MessageCircleQuestion size={14} />
-                              </button>
-                            </div>
-                          </div>
-                        </>
+                        message.text
                       )}
                     </div>
                   </div>
                 ))}
               </div>
-              <form onSubmit={handleSubmit} className="flex justify-between items-center gap-2 px-[250px] relative">
-               <div className='relative w-full'>
-               <textarea
+
+              <form onSubmit={handleSubmit} className="flex gap-2">
+                <input
+                  type="text"
                   value={inputMessage}
                   onChange={(e) => setInputMessage(e.target.value)}
-                  placeholder="Escreva sua consulta ?"
-                  className="w-full flex-1 px-5 bg-[var(--backgroundTwo)] py-8 focus:outline-none focus:ring-5 rounded-2xl focus:ring-[var(--backgroundThree)] overflow-hidden"
+                  placeholder="Converse com o Chucks..."
+                  className="flex-1 p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-400"
                   disabled={isLoading}
-                  rows={1}
-                  style={{
-                    resize: 'none',
-                    maxHeight: '10em',
-                    minHeight: '2em',
-                  }}
                 />
                 <button
                   type="submit"
-                  className="absolute flex justify-center items-center bottom-3 right-1 bg-[var(--foreground)] h-10 w-10 rounded-full"
+                  className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 
+                     disabled:bg-gray-400 transition-colors duration-200"
                   disabled={isLoading || !inputMessage.trim()}
                 >
-                  {isLoading ? (
-                      <CirclePause size={20} className='text-[var(--background)] text-2xl' />
-                  ): (
-                    <ArrowUpRight size={20} className='text-[var(--background)] text-2xl' />
-                  )}
+                  {isLoading ? 'Enviando...' : 'Enviar'}
                 </button>
-               </div>
               </form>
             </div>
           </ResizablePanel>

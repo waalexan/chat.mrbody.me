@@ -1,15 +1,29 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { GoogleLogin } from '@/service/google.auth';
-import { Command, Eye, EyeOff, Key, Mail, User } from 'lucide-react';
+import { Command, Eye, EyeOff, Key, User } from 'lucide-react';
 import Link from 'next/link';
+import { endpoint } from '@/config/microservice';
+import { useRouter } from 'next/navigation';
+import { toast } from 'sonner';
+import Cookies from 'js-cookie';
 
 const LoginPage = () => {
-    const [showPassword, setShowPassword] = React.useState(false);
-    const [email, setEmail] = React.useState('');
-    const [password, setPassword] = React.useState('');
-    const [isLoading, setIsLoading] = React.useState(false);
+    const [showPassword, setShowPassword] = useState(false);
+    const [user, setUser] = useState('');
+    const [password, setPassword] = useState('');
+    const [isLoading, setIsLoading] = useState(false);
+    const [redirect, setRedirect] = useState<string | null>(null);
+    const [error, setError] = useState('');
+
+    const router = useRouter();
+
+    useEffect(() => {
+        const params = new URLSearchParams(window.location.search);
+        const redirectParam = params.get('redirect');
+        setRedirect(redirectParam);
+    }, []);
 
     const handleGoogleLogin = async () => {
         try {
@@ -24,44 +38,75 @@ const LoginPage = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-    
-        // Simulação da lógica de autenticação
+
         try {
-            // Substitua com sua lógica real de login
-            const mockToken = 'walter'; // aqui você usaria o token real da resposta do login
-            const urlParams = new URLSearchParams(window.location.search);
-            const redirect = urlParams.get('redirect') || 'myapp://chatbot';
-    
-            console.log({ email, password });
-    
-            // Redireciona com o token na URL
-            window.location.href = `${redirect}?token=${mockToken}`;
+            setIsLoading(true);
+            const response = await fetch(`${endpoint.api_login}/auth/enter`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ user, password }),
+            });
+
+            const result = await response.json();
+
+            if (response.status === 201 || response.status === 202) {
+                setError("Usuário não encontrado");
+                toast("Usuário não encontrado", {
+                    description: "Verifique seu usuário ou senha",
+                    action: {
+                        label: "Esqueceu? Clique aqui",
+                        onClick: () => router.push("/reset"),
+                    },
+                });
+            } else if (response.status === 203) {
+                router.push(`/account/otp/${result.id}?name=${result.name}&email=${result.email}&phone=${result.phone}&verified=true`);
+            } else if (response.status === 200) {
+                Cookies.set('user_id', result.id, { expires: 7 });
+                Cookies.set('user_name', result.name, { expires: 7 });
+                Cookies.set('user_email', result.email, { expires: 7 });
+                Cookies.set('user_phone', result.phone, { expires: 7 });
+                Cookies.set('token', result.id, { expires: 7 });
+
+                const redirectUrl = `${redirect}?id=${result.id}&name=${encodeURIComponent(result.name)}&email=${encodeURIComponent(result.email)}&phone=${encodeURIComponent(result.phone)}`;
+                const extra = process.env.NEXT_PUBLIC_API_APP_REDIRECT || "mapazzz://login";
+
+                if (redirect?.startsWith('http') || redirect?.startsWith(extra)) {
+                    window.location.href = redirectUrl;
+                } else {
+                    router.replace(redirect || '/');
+                }
+            } else {
+                setError(result.message || 'Erro ao fazer login');
+                toast("Erro ao fazer login", {
+                    description: result.message,
+                });
+            }
         } catch (error) {
             console.error('Erro ao fazer login:', error);
-            // Aqui você pode exibir uma mensagem de erro ao usuário
+            setError('Erro ao fazer login');
+        } finally {
+            setIsLoading(false);
         }
     };
-    
 
     return (
         <div className='h-screen w-full flex flex-col lg:flex-row bg-[var(--backgroundTwo)]'>
-            {/* Lado esquerdo - Visível apenas em desktop */}
             <div className='hidden lg:flex lg:w-1/2 flex-col justify-between p-10 lg:p-20 bg-[var(--background)] border-r border-[var(--border-line)]'>
                 <div className='flex items-center gap-3'>
                     <Command size={32} className='text-[var(--primary-color)]' />
                     <h1 className='text-xl font-semibold'>Acme Inc</h1>
                 </div>
-                
                 <div className='flex flex-col gap-2'>
                     <blockquote className='text-lg italic'>
-                        "This library has saved me countless hours of work and helped me deliver stunning designs to my clients faster than ever before."
+                        "Essa plataforma me economizou horas de trabalho e melhorou minha produtividade."
                     </blockquote>
                     <span className='font-medium'>Sofia Davis</span>
-                    <span className='text-sm text-[var(--foreground-secondary)]'>CTO at Acme</span>
+                    <span className='text-sm text-[var(--foreground-secondary)]'>CTO na Acme</span>
                 </div>
             </div>
 
-            {/* Lado direito - Formulário de Login */}
             <div className='w-full lg:w-1/2 flex flex-col items-center justify-center p-6 sm:p-10 lg:p-20'>
                 <div className='w-full max-w-md'>
                     <div className='mb-8 text-center lg:text-left'>
@@ -72,21 +117,19 @@ const LoginPage = () => {
                     </div>
 
                     <form onSubmit={handleSubmit} className='space-y-4'>
-                        {/* Campo de Email */}
                         <div className='relative'>
                             <div className='absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none'>
                                 <User size={18} className='text-[#333]' />
                             </div>
                             <input
                                 className='w-full pl-10 border border-[var(--border-line)] py-3 px-3 rounded-md outline-none focus:ring-2 focus:ring-[var(--primary-color)] bg-transparent'
-                                type='email'
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                                placeholder='seuemail@example.com or numero'
+                                type='text'
+                                value={user}
+                                onChange={(e) => setUser(e.target.value)}
+                                placeholder='seuemail@example.com ou número'
                                 required
                             />
                         </div>
-
 
                         <div className='relative'>
                             <div className='absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none'>
@@ -109,27 +152,25 @@ const LoginPage = () => {
                             </button>
                         </div>
 
-                        <div>
-                            <Link href={"/reset"}
-                            className='text-sm text-[var(--primary-color)] justify-end hover:underline'
-                            >
-                                Esquece a minha palavra-passe
+                        <div className='flex justify-end'>
+                            <Link href="/reset" className='text-sm text-[var(--primary-color)] hover:underline'>
+                                Esqueceu a senha?
                             </Link>
                         </div>
 
                         <button
                             type='submit'
                             disabled={isLoading}
-                            className='w-full p-3 rounded-md cursor-pointer bg-[var(--primary-color)] text-white font-medium hover:bg-[var(--backgroundFour)] transition disabled:opacity-50 disabled:cursor-not-allowed'
+                            className='w-full p-3 rounded-md bg-[var(--primary-color)] text-white font-medium hover:bg-[var(--backgroundFour)] transition disabled:opacity-50 disabled:cursor-not-allowed'
                         >
                             {isLoading ? 'Entrando...' : 'Entrar com e-mail'}
                         </button>
                     </form>
 
-
                     <div className='mt-8 text-sm text-center text-[var(--foreground-secondary)]'>
                         <span>
-                            Eu não tenho uma conta? <Link href={"/register"} className='text-[var(--primary-color)] hover:underline'>Sign up</Link>
+                            Não tem uma conta?{' '}
+                            <Link href="/register" className='text-[var(--primary-color)] hover:underline'>Cadastre-se</Link>
                         </span>
                     </div>
 
@@ -138,7 +179,6 @@ const LoginPage = () => {
                         <span className='mx-4 text-sm text-[var(--foreground-secondary)]'>OU</span>
                         <div className='flex-grow border-t border-[var(--border-line)]'></div>
                     </div>
-
 
                     <button
                         onClick={handleGoogleLogin}
@@ -161,7 +201,6 @@ const LoginPage = () => {
         </div>
     );
 };
-
 
 const GoogleIcon = () => (
     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" width="20" height="20">

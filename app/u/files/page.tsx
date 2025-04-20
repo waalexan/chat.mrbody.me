@@ -15,7 +15,7 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table";
-import { Ellipsis, Eye, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { employeeProp } from "@/app/types/interfaces";
 import { useEffect, useState } from "react";
 import { database } from "@/config/firebase";
@@ -32,7 +32,7 @@ export default function App() {
     const employeesRef = ref(database, 'employees/');
     onValue(employeesRef, (snapshot) => {
       const data = snapshot.val();
-      const employeesList = data ? Object.values(data) : [];
+      const employeesList = data ? Object.values(data) as employeeProp[] : [];
       setEmployees(employeesList);
       setFilteredData(employeesList); // <- Aqui corrige o erro
     });

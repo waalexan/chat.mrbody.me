@@ -1,5 +1,5 @@
 import { Document, Page, Text, View, StyleSheet, Image } from '@react-pdf/renderer';
-import { employeeProp } from "@/app/@types/interfaces";
+import { employeeProp } from "../app/types/interfaces";
 
 const styles = StyleSheet.create({
   page: {

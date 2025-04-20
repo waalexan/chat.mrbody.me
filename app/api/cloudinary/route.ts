@@ -13,7 +13,7 @@ export async function POST(req: NextRequest) {
   try {
     const signature = cloudinary.utils.api_sign_request(
       paramsToSign,
-      process.env.CLOUDINARY_API_SECRET
+      process.env.CLOUDINARY_API_SECRET || ""
     );
     return NextResponse.json({ signature });
   } catch (error) {

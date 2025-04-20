@@ -1,24 +1,38 @@
+'use client'; // Se estiver usando app router
+
+import { useEffect, useState } from 'react';
 import LeandPage from "./_leandpage/leandpage";
-import Dashboard from "./u/page";
-
-const useToken = () => {  // Removed async since there's no await
-    try {
-        const response = true;
-
-        if (response)
-            return { status: 200, token: "7w7950nnxkchhiy78ry2" };
-        else
-            return { status: 404, token: null };  // Added token: null for consistency
-    } catch (error) {
-        console.error(error);
-        return { status: 500, token: null };  // Return a default error state
-    }
-}
+import Dashboard from "./u/home/page";
 
 export default function Main() {
-    const {status, token} = useToken();  // This is synchronous now
+    const [tokenData, setTokenData] = useState<{ status: number, token: string | null } | null>(null);
 
-    if(token && status === 200)  // Using strict equality ===
+    useEffect(() => {
+        const fetchToken = async () => {
+            try {
+                const response = await fetch('/api/local', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json'
+                    },
+                    credentials: 'include'
+                });
+
+                const data = await response.json();
+                setTokenData(data);
+            } catch (error) {
+                console.error(error);
+                setTokenData({ status: 500, token: null });
+            }
+        };
+
+        fetchToken();
+    }, []);
+
+    if (!tokenData) return <div>Carregando...</div>;
+
+    if (tokenData.token && tokenData.status === 200)
         return <Dashboard />;
     else
         return <LeandPage />;
