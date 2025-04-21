@@ -26,31 +26,50 @@ import {
   TableHeader,
   TableRow
 } from "@/components/ui/table";
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuTrigger
-} from "@/components/ui/dropdown-menu";
-import { Ellipsis, Eye, Search } from "lucide-react";
-import { employeeProp } from "@/app/types/interfaces";
+
+import { Search } from "lucide-react";
 import { useEffect, useState } from "react";
 import { database } from "@/config/firebase";
 import { toast } from "sonner"
 import { ref, onValue } from "firebase/database";
+import { formatDistanceToNowStrict } from 'date-fns';
+import { ptBR } from 'date-fns/locale';
+import { useRouter } from "next/navigation";
+
+interface ReportProps {
+  id: string; // Adicionado o id aqui
+  id_user: string | null;
+  user_name: string | null;
+  user_photo: string | null;
+  user_email: string | null;
+  user_phone: string | null;
+  title: string | null;
+  description: string | null;
+  address: string | null;
+  photo: string | null;
+  lat: number | null;
+  lon: number | null;
+  created_at: Date;
+}
 
 export default function App() {
   const [searchTerm, setSearchTerm] = useState<string>("");
-  const [employees, setEmployees] = useState<employeeProp[]>([]);
-  const [filteredData, setFilteredData] = useState<employeeProp[]>([]);
+  const [reports, setReports] = useState<ReportProps[]>([]);
+  const [filteredData, setFilteredData] = useState<ReportProps[]>([]);
+  const router = useRouter();
 
   useEffect(() => {
-    const employeesRef = ref(database, 'employees/');
-    onValue(employeesRef, (snapshot) => {
+    const reportsRef = ref(database, 'reports/');
+    onValue(reportsRef, (snapshot) => {
       const data = snapshot.val();
-      const employeesList = data ? Object.values(data) as employeeProp[] : [];
-      setEmployees(employeesList);
-      setFilteredData(employeesList); // <- Aqui corrige o erro
+      const reportsList = data
+        ? Object.entries(data).map(([id, report]) => ({
+            id, // Aqui estamos pegando a chave do Firebase e atribuindo como id
+            ...report
+          }))
+        : [];
+      setReports(reportsList);
+      setFilteredData(reportsList);
 
       toast("Event has been created", {
         description: "Sunday, December 03, 2023 at 9:00 AM",
@@ -59,35 +78,8 @@ export default function App() {
           onClick: () => console.log("Undo"),
         },
       })
-
     });
   }, []);
-
-  // Função para imprimir PDF
-  const handlePrint = ({ data }: { data: employeeProp }) => {
-    const doc = pdf(<PDFDocument data={data} />);
-    doc.toBlob().then((blob) => {
-      const url = URL.createObjectURL(blob);
-      const iframe = document.createElement('iframe');
-      iframe.style.position = 'absolute';
-      iframe.style.visibility = 'hidden';
-      iframe.src = url;
-      document.body.appendChild(iframe);
-      iframe.contentWindow?.print();
-    });
-  };
-
-  // Função para baixar PDF
-  const handleDownload = ({ data }: { data: employeeProp }) => {
-    const doc = pdf(<PDFDocument data={data} />);
-    doc.toBlob().then((blob) => {
-      const url = URL.createObjectURL(blob);
-      const link = document.createElement('a');
-      link.href = url;
-      link.download = `${data.name} Inicio de funções.pdf`;
-      link.click();
-    });
-  };
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     const searchQuery = e.target.value.toLowerCase();
@@ -96,11 +88,10 @@ export default function App() {
   };
 
   const filterData = (searchQuery: string) => {
-    const filtered = employees.filter((item) =>
-      item.name.toLowerCase().includes(searchQuery) ||
-      item.BI.toLowerCase().includes(searchQuery) ||
-      item.email.toLowerCase().includes(searchQuery) ||
-      item.phone.toLowerCase().includes(searchQuery)
+    const filtered = reports.filter((item) =>
+      item.address?.toLowerCase().includes(searchQuery) ||
+      item.title?.toLowerCase().includes(searchQuery) ||
+      item.description?.toLowerCase().includes(searchQuery)
     );
     setFilteredData(filtered);
   };
@@ -123,94 +114,83 @@ export default function App() {
 
           <ResizableHandle />
 
-          <ResizablePanel defaultSize={80}>
+          <ResizablePanel defaultSize={80} className="">
             <div className="border-b-1 border-b-[var(--border-line)] h-[50px] flex flex-row justify-center items-center px-3">
               <Search size={18} className="mr-2" />
               <input
                 type="text"
                 value={searchTerm}
                 onChange={handleSearch}
-                placeholder="Pesquisar por nome, BI, email, telefone..."
+                placeholder="Pesquisar por zonas..."
                 className="p-2 w-full outline-0"
               />
             </div>
 
-            <Table>
-              <TableHeader>
-                <TableRow>
-                  <TableHead>#</TableHead>
-                  <TableHead>BI</TableHead>
-                  <TableHead>Nome</TableHead>
-                  <TableHead>Email</TableHead>
-                  <TableHead>Telefone</TableHead>
-                  <TableHead>Cargo</TableHead>
-                  <TableHead>Endereço</TableHead>
-                  <TableHead>Agente Nº</TableHead>
-                  <TableHead>Ações</TableHead>
-                  <TableHead></TableHead>
-                </TableRow>
-              </TableHeader>
-
-              <TableBody>
-                {filteredData.map((item, index) => (
-                  <TableRow key={index}>
-                    <TableCell>{index + 1}</TableCell>
-                    <TableCell>{item.BI}</TableCell>
-                    <TableCell>{item.name}</TableCell>
-                    <TableCell>{item.email}</TableCell>
-                    <TableCell>{item.phone}</TableCell>
-                    <TableCell>{item.cargo}</TableCell>
-                    <TableCell>{item.address}</TableCell>
-                    <TableCell>{item.AgenteNumber}</TableCell>
-
-                    <TableCell>
-                      <Dialog>
-                        <DialogTrigger asChild>
-                          <button className="text-sm text-blue-600 flex items-center gap-2">
-                            <Eye size={18} />
-                            <span>Visualizar</span>
-                          </button>
-                        </DialogTrigger>
-                        <DialogContent className="w-[90vw] h-[90vh] flex flex-col">
-                          <DialogHeader>
-                            <DialogTitle>Visualização do PDF</DialogTitle>
-                            <DialogDescription>
-                              Pré-visualização do relatório do funcionário.
-                            </DialogDescription>
-                          </DialogHeader>
-                          <div className="flex-grow w-full">
-                            <PDFViewer width="100%" height="100%" className="rounded-md">
-                              <PDFDocument data={item} />
-                            </PDFViewer>
-                          </div>
-                          <DialogFooter />
-                        </DialogContent>
-                      </Dialog>
-                    </TableCell>
-
-                    <TableCell>
-                      <DropdownMenu>
-                        <DropdownMenuTrigger>
-                          <Ellipsis size={18} />
-                        </DropdownMenuTrigger>
-                        <DropdownMenuContent>
-                          <DropdownMenuItem onClick={() => handlePrint({ data: item })}>
-                            Imprimir
-                          </DropdownMenuItem>
-                          <DropdownMenuItem onClick={() => handleDownload({ data: item })}>
-                            Baixar
-                          </DropdownMenuItem>
-                          <DropdownMenuItem>
-                            Detalhes
-                          </DropdownMenuItem>
-                        </DropdownMenuContent>
-                      </DropdownMenu>
-                    </TableCell>
+            <div className="overflow-y-auto max-h-[calc(100vh-50px)]">
+              <Table>
+                <TableHeader>
+                  <TableRow>
+                    <TableHead>#</TableHead>
+                    <TableHead>imagem</TableHead>
+                    <TableHead>Reportagem</TableHead>
+                    <TableHead>Endereço</TableHead>
+                    <TableHead>Data</TableHead>
+                    <TableHead>Ações</TableHead>
                   </TableRow>
-                ))}
-              </TableBody>
-            </Table>
+                </TableHeader>
+
+                <TableBody>
+                  {filteredData.map((item, index) => (
+                    <TableRow key={index} onClick={() => router.push(`/u/employee/${item.id}`)}>
+                      <TableCell>{index + 1}</TableCell>
+
+                      <TableCell>
+                        <div
+                          style={{
+                            width: "100px",
+                            height: "100px",
+                            borderRadius: "6px",
+                            backgroundImage: `url(${item.photo})`,
+                            backgroundSize: "cover",
+                            backgroundPosition: "center",
+                            backgroundRepeat: "no-repeat",
+                          }}
+                        />
+                      </TableCell>
+
+                      <TableCell>
+                        <h2 className="font-semibold">{item.title}</h2>
+                      </TableCell>
+
+                      <TableCell>{item.description}</TableCell>
+
+                      <TableCell>
+                        <div className="flex flex-col">
+                          <span className="font-medium">{item.address}</span>
+                          <span className="text-xs text-muted-foreground">
+                            Lat: {item.lat} | Lon: {item.lon}
+                          </span>
+                        </div>
+                      </TableCell>
+
+                      <TableCell>
+                        {item.created_at && !isNaN(new Date(item.created_at).getTime()) ? (
+                          formatDistanceToNowStrict(new Date(item.created_at), {
+                            addSuffix: true,
+                            locale: ptBR,
+                          })
+                        ) : (
+                          "Data inválida"
+                        )}
+                      </TableCell>
+                    </TableRow>
+                  ))}
+                </TableBody>
+
+              </Table>
+            </div>
           </ResizablePanel>
+
         </ResizablePanelGroup>
       </main>
     </div>

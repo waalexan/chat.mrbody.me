@@ -59,3 +59,26 @@ body {
   width: 100%;
   height: 2px;
 }
+
+/* Define o tamanho do scrollbar */
+::-webkit-scrollbar {
+  width: 4px;  /* largura para scroll vertical */
+  height: 12px; /* altura para scroll horizontal */
+}
+
+/* Define o estilo da "thumb" do scrollbar (parte que você arrasta) */
+::-webkit-scrollbar-thumb {
+  @apply bg-[var(--border-line)]; /* cor do thumb */
+  border-radius: 2px;    /* bordas arredondadas */
+}
+
+/* Define o estilo da "thumb" quando está sendo clicada */
+::-webkit-scrollbar-thumb:hover {
+  @apply bg-[var(--border-line)] ; /* cor quando o thumb está sendo pressionado */
+}
+
+/* Define o estilo da linha do scrollbar (track) */
+::-webkit-scrollbar-track {
+  @apply bg-[var(--background)]; /* cor do fundo do track */
+  border-radius: 10px;        /* bordas arredondadas */
+}
