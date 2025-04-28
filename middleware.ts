@@ -3,11 +3,8 @@ import type { NextRequest } from 'next/server';
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl;
-
   const isProtectedRoute = pathname.startsWith('/dashboard') || pathname.startsWith('/u/');
-
   const token = request.cookies.get('token')?.value;
-
   if (isProtectedRoute && !token) {
     const loginUrl = request.nextUrl.clone();
     loginUrl.pathname = '/login';
