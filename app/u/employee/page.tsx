@@ -65,7 +65,7 @@ export default function App() {
       const reportsList = data
         ? Object.entries(data).map(([id, report]) => ({
             id, // Aqui estamos pegando a chave do Firebase e atribuindo como id
-            ...report
+            ...report as any
           }))
         : [];
       setReports(reportsList);

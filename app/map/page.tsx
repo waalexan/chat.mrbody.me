@@ -4,6 +4,7 @@ import { SideBar } from "@/components/Sidebar";
 import dynamic from 'next/dynamic';
 import { ResizableHandle, ResizablePanel, ResizablePanelGroup } from "@/components/ui/resizable";
 
+
 const MapComponent = dynamic(() => import('@/components/Mapa'), { ssr: false });
 export default function App() {
     return (

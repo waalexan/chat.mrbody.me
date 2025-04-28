@@ -1,4 +1,4 @@
-import { BrainCog, CircleHelp, CircleUser, Globe, Home, Key, Layers, Library, Lightbulb, Map, MapPin, Pin, Rocket, Settings, Users } from "lucide-react";
+import { BrainCog, CircleHelp, CircleUser, Globe, Home, Key, Layers, Library, Lightbulb, ListVideo, Map, MapPin, Pin, Rocket, Settings, Users } from "lucide-react";
 
 export const sideData = [
     {
@@ -20,6 +20,11 @@ export const sideData = [
         icon: Map,
         label: "Mapa",
         route: "/map"
+    },
+    {
+        icon: ListVideo,
+        label: "live",
+        route: "/live"
     },
     {
         icon: Settings,
