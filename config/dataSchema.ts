@@ -9,7 +9,7 @@ export const sideData = [
     {
         icon: Layers,
         label: "Estatistica",
-        route: "/estatistica"
+        route: "/charts"
     },
     {
         icon: BrainCog,

@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from 'react';
 import LeandPage from "./_leandpage/leandpage";
-import Dashboard from "./u/home/page";
+import Dashboard from "./charts/page";
 
 export default function Main() {
     const [tokenData, setTokenData] = useState<{ status: number, token: string | null } | null>(null);
